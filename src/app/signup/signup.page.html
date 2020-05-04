@@ -1,0 +1,38 @@
+<ion-content>
+
+  <div class="logo-box">
+    <img [src]="logoPath" alt="">
+  </div>
+
+  <div class="login-form">
+    <h2 text-center>
+      <small>Sign in to continue</small>
+    </h2>
+
+    <form [formGroup]="this.signupForm">
+      <ion-list lines="none">
+
+        <ion-item>
+          <ion-input formControlName="name" type="text" placeholder="Enter your name" text-left>
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input formControlName="email" type="email" placeholder="Enter your email"></ion-input>
+        </ion-item>
+
+      </ion-list>
+
+    </form>
+
+
+    <ion-button mode="ios" [disabled]="signupForm.invalid" color="primary" expand="block" (click)="onRegister()">
+      Confirm
+    </ion-button>
+
+    <p text-center>
+      We will send you a One Time email message.
+    </p>
+  </div>
+
+</ion-content>

@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-avatar slot="start" class="contact-avatar">
+      <img *ngIf="!contactInfo.avatar" style="margin-left: 8px !important;" src="../../assets/imgs/profile2.png" />
+      <img *ngIf="contactInfo.avatar" style="margin-left: 8px !important;" [src]="contactInfo.name" />
+    </ion-avatar>
+    <ion-title (tap)="showContactProfile()">
+      <ion-label>
+        <h3>{{ contactInfo.name }}</h3>
+        <p *ngIf="contactInfo.isConnected"><small>{{'Online'}}</small></p>
+        <p *ngIf="!contactInfo.isConnected">
+          <small>Last time at </small><small>{{contactInfo.lastConnection|date:'short' ||'Offline'}}</small>
+        </p>
+      </ion-label>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg">
+
+  <div class="chat-container">
+    <div *ngFor="let message of messages" class="chat-bubble" [id]="message._id" [(ngClass)]="message.action">
+      <h6>{{ message.message }}</h6>
+      <p style="font-size: 12.5px; margin-right: 8px;">{{ message.date | date:'short'}}
+      </p>
+      <ion-icon *ngIf="message.action == 'send'" class="iconStatus" name="checkmark" md="md-checkmark"></ion-icon>
+    </div>
+  </div>
+
+  <div class="chat-controls" [ngClass]="{'active': showOptions}">
+    <ion-row class="option ion-text-center">
+      <ion-col size="4">
+        <ion-icon name="camera"></ion-icon>Camera
+      </ion-col>
+      <ion-col size="4">
+        <ion-icon name="image"></ion-icon>Gallery
+      </ion-col>
+      <ion-col size="4">
+        <ion-icon name="people"></ion-icon>Contact
+      </ion-col>
+      <ion-col size="4">
+        <ion-icon name="headset"></ion-icon> Audio
+      </ion-col>
+      <ion-col size="4">
+        <ion-icon name="pin"></ion-icon>Location
+      </ion-col>
+      <ion-col size="4">
+        <ion-icon name="document"></ion-icon> Document
+      </ion-col>
+    </ion-row>
+    <ion-row class="bg-white">
+      <ion-col size="9" class="ion-no-padding">
+        <ion-list lines="none" class="ion-no-padding">
+          <ion-item>
+            <ion-textarea rows="1" placeholder="Type your message" type="text" [formControl]="textForm"
+              (focus)="showOptionsToggle(false)"></ion-textarea>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+      <ion-col size="3" class="ion-no-padding">
+        <p class="ion-text-center icon-controls">
+          <ion-icon name="send" class="text-primary" (click)="onSendMessage()"></ion-icon>
+          <ion-icon mode="ios" name="add-circle" *ngIf="!showOptions" (click)="showOptionsToggle()"></ion-icon>
+          <ion-icon mode="ios" name="close-circle" *ngIf="showOptions" (click)="showOptionsToggle()"></ion-icon>
+        </p>
+      </ion-col>
+    </ion-row>
+  </div>
+
+</ion-content>

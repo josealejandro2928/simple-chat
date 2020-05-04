@@ -1,0 +1,7 @@
+{
+  "name": "Chapp",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

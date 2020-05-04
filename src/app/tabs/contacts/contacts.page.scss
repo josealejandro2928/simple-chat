@@ -1,0 +1,19 @@
+.iconConnected {
+    position: absolute;
+    right: 16px;
+    top: calc(50% - 4px);
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: #4caf50;
+}
+
+.iconNotConnected {
+    position: absolute;
+    right: 16px;
+    top: calc(50% - 4px);
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+}

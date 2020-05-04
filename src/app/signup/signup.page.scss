@@ -1,0 +1,18 @@
+.logo-box {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 0px !important;
+}
+
+.logo-box img {
+    position: absolute;
+    width: 120px !important;
+    height: 120px !important;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto !important;
+}

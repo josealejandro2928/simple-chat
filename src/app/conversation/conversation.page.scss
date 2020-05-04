@@ -1,0 +1,145 @@
+.chat-bubble {
+    width: auto;
+    max-width: 85%;
+    min-width: 25%;
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin: 14px;
+    display: block;
+    clear: both;
+    position: relative;
+    margin-bottom: 0;
+    box-shadow: 0px 1px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 1px 0px rgba(0, 0, 0, 0.12);
+
+    &.received {
+        background: #FFF;
+        float: left;
+    }
+
+    &.send {
+        background: var(--ion-color-secondary);
+        float: right;
+        text-align: left;
+        color: #fff;
+    }
+
+    .iconStatus {
+        position: absolute;
+        bottom: 6px;
+        right: 4px;
+        font-size: 20px;
+    }
+
+    h6 {
+        margin: 0;
+        margin-bottom: 4px;
+        font-weight: 400;
+    }
+
+    p {
+        margin: 0;
+        font-size: 1rem;
+        opacity: .6;
+    }
+
+}
+
+.chat-container {
+    height: calc(100% - 60px);
+    overflow: scroll;
+    background-color: #fDfDfD !important;
+}
+
+.chat-controls {
+    background: #FFF;
+    padding: 3px 2px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -1px 43px 5px rgba(98, 98, 98, .1);
+    z-index: 9;
+
+    .option {
+        height: 0;
+        overflow: hidden;
+        -webkit-transition: all .3s;
+        transition: all .3s;
+
+        ion-col {
+            color: var(--ion-color-primary);
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        ion-icon::before {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            font-size: 3rem;
+            line-height: 65px;
+        }
+
+        ion-icon {
+            color: var(--ion-color-primary);
+            display: block;
+            width: 25px;
+            height: 25px;
+            background: #f3f9f5;
+            border-radius: 50px;
+            margin: auto;
+            margin-bottom: auto;
+            padding: 15px;
+            position: relative;
+            margin-bottom: 7px;
+        }
+    }
+
+    &.active {
+        .option {
+            height: 230px;
+            transition: all .3s;
+        }
+    }
+
+    ion-row ion-col {
+        ion-list {
+            margin: 0 -2px;
+
+            ion-item {
+                border-radius: 7px;
+                --background: #fff;
+                -webkit-box-shadow: none !important;
+                box-shadow: none !important;
+                border-bottom: none !important;
+            }
+        }
+
+        p {
+            border-radius: 7px;
+            font-size: 14pt;
+            margin: 0;
+            line-height: 44px;
+            height: 44px;
+            color: #bcbcbc;
+            min-width: 20px;
+            overflow: hidden;
+
+            ion-icon {
+                width: 22px;
+                height: 22px;
+                text-align: center;
+                font-size: 2.5rem;
+                color: #828282;
+                margin-top: 11px;
+                color: #828282;
+                margin-left: 5px;
+                margin-right: 5px;
+            }
+        }
+    }
+
+}

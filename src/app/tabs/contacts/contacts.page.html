@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Contacts
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg">
+
+  <ion-list lines="none" class="app-list">
+    <ion-item style="position: relative;" *ngFor="let contact of contactsList" (click)="showConversationPage(contact)">
+      <ion-avatar slot="start">
+        <img *ngIf="contact.avatar" [src]="contact.avatar">
+        <img *ngIf="!contact.avatar" src="../../../assets/imgs/profile2.png">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ contact.name }}</h2>
+        <p>{{ contact.msg }}</p>
+      </ion-label>
+      <div [ngClass]="{'iconConnected':contact.isConnected , 'iconNotConnected':!contact.isConnected }">
+
+      </div>
+
+    </ion-item>
+  </ion-list>
+
+</ion-content>
