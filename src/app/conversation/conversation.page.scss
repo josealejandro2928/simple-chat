@@ -14,13 +14,14 @@
     &.received {
         background: #FFF;
         float: left;
+        color: rgba(0, 0, 0, .87);
     }
 
     &.send {
-        background: var(--ion-color-secondary);
+        background: var(--ion-color-primary);
         float: right;
         text-align: left;
-        color: #fff;
+        color: #ffff
     }
 
     .iconStatus {
@@ -28,6 +29,15 @@
         bottom: 6px;
         right: 4px;
         font-size: 20px;
+    }
+
+    .statusNotRead {
+        color: #FFF;
+        opacity: 0.6;
+    }
+
+    .statusRead {
+        color: #81d4fa;
     }
 
     h6 {
@@ -47,7 +57,7 @@
 .chat-container {
     height: calc(100% - 60px);
     overflow: scroll;
-    background-color: #fDfDfD !important;
+    background-color: #f5f5f5 !important;
 }
 
 .chat-controls {

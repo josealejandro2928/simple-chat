@@ -10,9 +10,12 @@
     <ion-title (tap)="showContactProfile()">
       <ion-label>
         <h3>{{ contactInfo.name }}</h3>
-        <p *ngIf="contactInfo.isConnected"><small>{{'Online'}}</small></p>
+        <p *ngIf="contactInfo.isConnected && !isWriting"><small>{{'Online'}}</small></p>
         <p *ngIf="!contactInfo.isConnected">
           <small>Last time at </small><small>{{contactInfo.lastConnection|date:'short' ||'Offline'}}</small>
+        </p>
+        <p *ngIf="contactInfo.isConnected && isWriting">
+          <small>{{textIsWriting}}</small>
         </p>
       </ion-label>
     </ion-title>
@@ -26,7 +29,12 @@
       <h6>{{ message.message }}</h6>
       <p style="font-size: 12.5px; margin-right: 8px;">{{ message.date | date:'short'}}
       </p>
-      <ion-icon *ngIf="message.action == 'send'" class="iconStatus" name="checkmark" md="md-checkmark"></ion-icon>
+      <ion-icon *ngIf="message.action == 'send'" class="iconStatus"
+        [ngClass]="{'statusNotRead': message.status == 'unread' ,'statusRead':message.status =='read'}" name="checkmark"
+        md="md-checkmark"></ion-icon>
+      <ion-icon *ngIf="message.action == 'send' && message.status =='read'" class="iconStatus statusRead"
+        style="bottom:10px !important" name="checkmark" md="md-checkmark">
+      </ion-icon>
     </div>
   </div>
 

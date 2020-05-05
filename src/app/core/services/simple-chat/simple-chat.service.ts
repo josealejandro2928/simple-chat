@@ -7,12 +7,13 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class SimpleChatService {
-  chatUrl = environment.apiUrl + 'chat';
+  chatInitUrl = environment.apiUrl + 'chat/init';
   chatUrlId = environment.apiUrl + 'chat/:id';
+  chatUrl = environment.apiUrl + 'chat';
 
   constructor(private httpClient: HttpClient) {}
 
-  public getChat(params): Observable<any> {
+  public initChat(params): Observable<any> {
     if (params.chatId) {
       return this.getChatById(params.chatId);
     }
@@ -20,7 +21,7 @@ export class SimpleChatService {
     if (params.userToId) {
       httpParams = httpParams.set('userToId', params.userToId);
     }
-    return this.httpClient.get<any>(this.chatUrl, { params: httpParams });
+    return this.httpClient.get<any>(this.chatInitUrl, { params: httpParams });
   }
 
   public getChatById(id): Observable<any> {
@@ -28,6 +29,10 @@ export class SimpleChatService {
   }
 
   public sendMessage(data): Observable<any> {
-    return this.httpClient.post<any>(this.chatUrl, data);
+    return this.httpClient.post<any>(
+      this.chatUrlId.replace(':id', data.chatId),
+      data
+    );
   }
+  
 }

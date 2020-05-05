@@ -4,7 +4,7 @@ import { SimpleChatService } from './../core/services/simple-chat/simple-chat.se
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, debounceTime } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -22,12 +22,16 @@ export class ConversationPage implements OnInit {
     avatar: '../../assets/imgs/profile2.png',
     _id: Date.now(),
   };
+  lastMessageId = null;
 
   private messages: Array<any> = [];
 
   loggedInUser: any;
   _unsubscribeAll: Subject<any> = new Subject();
   textForm: FormControl = new FormControl();
+  isWriting = false;
+  textIsWriting = '...is writing something.';
+  timeInterval = undefined;
 
   constructor(
     private simpleChatService: SimpleChatService,
@@ -46,9 +50,16 @@ export class ConversationPage implements OnInit {
       'ConversationPage -> ionViewWillEnter ->  this.queryParams',
       this.queryParams
     );
-    this.getChat(this.queryParams);
+    this.initChat(this.queryParams);
     ////////////////////////////////////////////////////////
     this.eventFromSocket();
+    this.textForm.valueChanges
+      .pipe(takeUntil(this._unsubscribeAll), debounceTime(250))
+      .subscribe((data) => {
+        if (data && data.length > 10) {
+          this.socket.emit('user-typing', { chatId: this.chat._id });
+        }
+      });
   }
 
   eventFromSocket() {
@@ -59,13 +70,13 @@ export class ConversationPage implements OnInit {
       .subscribe((data: any) => {
         let message = data.data;
         this.messages.push(message);
-        let timeOut = setTimeout(() => {
-          let elementDom = document.getElementById(message._id);
-          elementDom.scrollIntoView({ behavior: 'smooth' });
-          clearTimeout(timeOut);
-        }, 50);
+        this.markMessageAsRead(message);
+        this.scrollIntoMessage(message._id);
+        if (message.action == 'received') {
+          this.stopUserWriting();
+        }
       });
-      
+
     this.socket
       .fromEvent('users-changed')
       .pipe(takeUntil(this._unsubscribeAll))
@@ -81,11 +92,32 @@ export class ConversationPage implements OnInit {
           }
         }
       });
+    this.socket
+      .fromEvent('message-read')
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((data: any) => {
+        let index = this.messages.findIndex(
+          (item) => item._id.toString() == data.message._id.toString()
+        );
+        if (index > -1) {
+          this.messages[index] = data.message;
+        }
+      });
+
+    this.socket
+      .fromEvent('user-typing')
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((data: any) => {
+        this.showIsWriting();
+      });
   }
 
   ionViewWillLeave() {
     this._unsubscribeAll.next(true);
     this._unsubscribeAll.complete();
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
   }
 
   showOptionsToggle(value?: boolean) {
@@ -96,11 +128,15 @@ export class ConversationPage implements OnInit {
     this.showOptions = !this.showOptions;
   }
 
-  getChat(params) {
-    this.simpleChatService.getChat(params).subscribe((data) => {
+  initChat(params) {
+    this.simpleChatService.initChat(params).subscribe((data) => {
       this.messages = data.messages;
       this.chat = data.simpleChat;
       this.contactInfo = data.simpleChat.userTo;
+      this.lastMessageId = data.simpleChat.lastMessage;
+      if (this.lastMessageId) {
+        this.scrollIntoMessage(this.lastMessageId);
+      }
     });
   }
 
@@ -112,5 +148,58 @@ export class ConversationPage implements OnInit {
     };
     this.textForm.reset();
     this.simpleChatService.sendMessage(data).subscribe(() => {});
+  }
+
+  ///////////////////////////////UTILES////////////////////
+  scrollIntoMessage(_id) {
+    let timeOut = setTimeout(() => {
+      let elementDom = document.getElementById(_id);
+      elementDom.scrollIntoView({ behavior: 'smooth' });
+      clearTimeout(timeOut);
+    }, 50);
+  }
+
+  markMessageAsRead(message) {
+    if (message.action == 'received') {
+      this.socket.emit('mark-message-as-read', {
+        messageId: message._id,
+        chatId: this.chat._id,
+      });
+    }
+  }
+  showIsWriting() {
+    if (this.isWriting) {
+      return;
+    }
+
+    this.isWriting = true;
+    let counter = 0;
+    let times = 5;
+    this.timeInterval = setInterval(() => {
+      if (counter == 0) {
+        this.textIsWriting = ' is writing something.';
+      } else if (counter == 1) {
+        this.textIsWriting = '. is writing something.';
+      } else if (counter == 2) {
+        this.textIsWriting = '.. is writing something.';
+      } else if (counter == 3) {
+        this.textIsWriting = '... is writing something.';
+      } else if (counter == 4) {
+        this.textIsWriting = ' is writing something.';
+        counter = 0;
+        times--;
+      }
+      counter++;
+      if (!times) {
+        clearInterval(this.timeInterval);
+        this.isWriting = false;
+      }
+    }, 350);
+  }
+  stopUserWriting() {
+    this.isWriting = false;
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
   }
 }
