@@ -56,7 +56,7 @@ export class ConversationPage implements OnInit {
     this.textForm.valueChanges
       .pipe(takeUntil(this._unsubscribeAll), debounceTime(250))
       .subscribe((data) => {
-        if (data && data.length > 10) {
+        if (data && data.length > 8) {
           this.socket.emit('user-typing', { chatId: this.chat._id });
         }
       });
