@@ -21,7 +21,6 @@ export class TokenInterceptorService implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     return from(this.loggedInUserService.getToken()).pipe(
       switchMap((token) => {
-        console.log('TokenInterceptorService -> constructor -> token', token);
         if (token) {
           request = request.clone({
             setHeaders: {

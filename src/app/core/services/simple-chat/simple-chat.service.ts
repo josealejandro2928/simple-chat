@@ -34,5 +34,15 @@ export class SimpleChatService {
       data
     );
   }
-  
+
+  public getMessages(chatId, query): Observable<any> {
+    let httpParams = new HttpParams();
+    for (let key in query) {
+      httpParams = httpParams.set(key, query[key]);
+    }
+    return this.httpClient.get<any>(
+      this.chatUrlId.replace(':id', chatId) + '/messages',
+      { params: httpParams }
+    );
+  }
 }

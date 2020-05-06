@@ -5,14 +5,16 @@
     </ion-buttons>
     <ion-avatar slot="start" class="contact-avatar">
       <img *ngIf="!contactInfo.avatar" style="margin-left: 8px !important;" src="../../assets/imgs/profile2.png" />
-      <img *ngIf="contactInfo.avatar" style="margin-left: 8px !important;" [src]="contactInfo.name" />
+      <img *ngIf="contactInfo.avatar" style="margin-left: 8px !important;" [src]="contactInfo.avatar" />
     </ion-avatar>
     <ion-title (tap)="showContactProfile()">
       <ion-label>
         <h3>{{ contactInfo.name }}</h3>
         <p *ngIf="contactInfo.isConnected && !isWriting"><small>{{'Online'}}</small></p>
         <p *ngIf="!contactInfo.isConnected">
-          <small>Last time at </small><small>{{contactInfo.lastConnection|date:'short' ||'Offline'}}</small>
+          <small *ngIf="contactInfo.lastConnection">Last time at
+          </small><small>{{contactInfo.lastConnection|date:'short' }}</small>
+          <small *ngIf="!contactInfo.lastConnection">{{'Offline' }}</small>
         </p>
         <p *ngIf="contactInfo.isConnected && isWriting">
           <small>{{textIsWriting}}</small>
@@ -22,20 +24,38 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg">
+<ion-content>
+  <div #chatContainer class="chat-container" (scroll)="onScroll($event)">
+    <ng-container *ngFor="let message of messages">
 
-  <div class="chat-container">
-    <div *ngFor="let message of messages" class="chat-bubble" [id]="message._id" [(ngClass)]="message.action">
-      <h6>{{ message.message }}</h6>
-      <p style="font-size: 12.5px; margin-right: 8px;">{{ message.date | date:'short'}}
-      </p>
-      <ion-icon *ngIf="message.action == 'send'" class="iconStatus"
-        [ngClass]="{'statusNotRead': message.status == 'unread' ,'statusRead':message.status =='read'}" name="checkmark"
-        md="md-checkmark"></ion-icon>
-      <ion-icon *ngIf="message.action == 'send' && message.status =='read'" class="iconStatus statusRead"
-        style="bottom:10px !important" name="checkmark" md="md-checkmark">
-      </ion-icon>
-    </div>
+      <div *ngIf="message._id == lastMessageReadOrSendId && notReadMessages " class="chat-bubble">
+        <ion-chip style="margin-left: auto; margin-right: auto;">
+          {{notReadMessages}} {{'not read messages'}}
+        </ion-chip>
+      </div>
+
+      <div (interceptMessage)="onInterceptMessage($event)" class="chat-bubble" [id]="message._id"
+        [ngClass]="{'send': message.action =='send','received':message.action =='received'}">
+        <h6>{{ message.message }}</h6>
+        <p style="font-size: 12.5px; margin-right: 8px;">{{ message.date | date:'short'}}
+        </p>
+        <ion-icon *ngIf="message.action == 'send'" class="iconStatus"
+          [ngClass]="{'statusNotRead': message.status == 'unread' ,'statusRead':message.status =='read'}"
+          name="checkmark" md="md-checkmark"></ion-icon>
+        <ion-icon *ngIf="message.action == 'send' && message.status =='read'" class="iconStatus statusRead"
+          style="bottom:10px !important" name="checkmark" md="md-checkmark">
+        </ion-icon>
+      </div>
+
+    </ng-container>
+
+    <ion-fab *ngIf="scrollDirection == 'up'" horizontal="end" class="fabCustom">
+      <ion-fab-button color="light" (click)="onScrollToEnd()">
+        <ion-icon name="arrow-down"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
+
   </div>
 
   <div class="chat-controls" [ngClass]="{'active': showOptions}">

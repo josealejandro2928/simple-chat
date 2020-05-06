@@ -6,6 +6,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { ConversationPage } from './conversation.page';
+import { InterceptMessageDirective } from './intercept-message.directive';
 
 const routes: Routes = [
   {
@@ -22,6 +23,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [ConversationPage],
+  declarations: [ConversationPage, InterceptMessageDirective],
 })
 export class ConversationPageModule {}
