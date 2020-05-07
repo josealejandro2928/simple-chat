@@ -16,6 +16,7 @@ import { NavigationExtras } from '@angular/router';
 })
 export class ContactsPage implements OnInit {
   contactsList: Array<any> = [];
+  isLoading = false;
 
   loggedInUser: any;
   _unsubscribeAll: Subject<any> = new Subject();
@@ -26,7 +27,7 @@ export class ContactsPage implements OnInit {
     private loggedInUserService: LoggedInUserService,
     private loaderService: LoaderService,
     private userService: UserService,
-    private socket: Socket
+    private socket: Socket,
   ) {
     console.log('akljdhailsndas das ;dans das;dl');
   }
@@ -36,9 +37,19 @@ export class ContactsPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.userService.getContacts().subscribe((data) => {
-      this.contactsList = data.data;
-    });
+    this.isLoading = true;
+    this.userService.getContacts().subscribe(
+      (data) => {
+        this.contactsList = data.data;
+        this.isLoading = false;
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 250);
+      },
+      () => {
+        this.isLoading = false;
+      },
+    );
 
     this._unsubscribeAll = new Subject<any>();
 

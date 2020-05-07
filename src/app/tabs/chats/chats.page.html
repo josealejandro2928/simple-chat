@@ -8,8 +8,7 @@
 
 <ion-content class="bg">
 
-  <ion-list>
-
+  <ion-list *ngIf="!this.isLoading">
     <ion-item style="position: relative;" *ngFor="let chat of chatList" (click)="showConversationPage()">
       <ion-avatar slot="start">
         <img *ngIf="!chat.userTo.avatar" src="../../assets/imgs/profile2.png" />
@@ -18,9 +17,22 @@
       <ion-label>
         <h3>{{ chat.userTo.name }}</h3>
         <p style="margin-top: 4px;">
-          {{ (chat.lastMessage.message.length < 35 )?chat.lastMessage.message:chat.lastMessage.message.substr(0,32) + ' ...' }}
+          <ng-container *ngIf="chat.lastMessage">
+            {{ (chat.lastMessage.message.length < 35 )?chat.lastMessage.message:chat.lastMessage.message.substr(0,32) + ' ...' }}
+          </ng-container>
+          <ng-container *ngIf="!chat.lastMessage">
+            {{ chat.userTo.msg }}
+          </ng-container>
         </p>
-        <p style=" text-align: right;">{{ chat.lastMessage.date|date:'short' }}</p>
+        <p style=" text-align: right;">
+          <ng-container *ngIf="chat.lastMessage">
+            {{ chat.lastMessage.date|date:'short' }}
+          </ng-container>
+          <ng-container *ngIf="!chat.lastMessage">
+            {{ chat.createdAt|date:'short' }}
+          </ng-container>
+
+        </p>
       </ion-label>
 
       <ion-badge [ngClass]="{'badgeConnected':chat.userTo.isConnected , 'badgeNotConnected':!chat.userTo.isConnected }">{{
@@ -28,6 +40,25 @@
       </ion-badge>
     </ion-item>
 
+  </ion-list>
+
+  <ion-list *ngIf="this.isLoading">
+    <ion-item *ngFor="let item of [1,2,3,4,5,6]">
+      <ion-thumbnail slot="start">
+        <ion-skeleton-text></ion-skeleton-text>
+      </ion-thumbnail>
+      <ion-label>
+        <h3>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </h3>
+        <p>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        </p>
+        <p>
+          <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+        </p>
+      </ion-label>
+    </ion-item>
   </ion-list>
 
 </ion-content>
