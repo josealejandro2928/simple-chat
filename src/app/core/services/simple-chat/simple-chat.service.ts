@@ -29,10 +29,7 @@ export class SimpleChatService {
   }
 
   public sendMessage(data): Observable<any> {
-    return this.httpClient.post<any>(
-      this.chatUrlId.replace(':id', data.chatId),
-      data
-    );
+    return this.httpClient.post<any>(this.chatUrlId.replace(':id', data.chatId), data);
   }
 
   public getMessages(chatId, query): Observable<any> {
@@ -40,9 +37,14 @@ export class SimpleChatService {
     for (let key in query) {
       httpParams = httpParams.set(key, query[key]);
     }
-    return this.httpClient.get<any>(
-      this.chatUrlId.replace(':id', chatId) + '/messages',
-      { params: httpParams }
-    );
+    return this.httpClient.get<any>(this.chatUrlId.replace(':id', chatId) + '/messages', { params: httpParams });
+  }
+
+  public getChats(query): Observable<any> {
+    let httpParams = new HttpParams();
+    for (let key in query) {
+      httpParams = httpParams.set(key, query[key]);
+    }
+    return this.httpClient.get<any>(this.chatUrl, { params: httpParams });
   }
 }

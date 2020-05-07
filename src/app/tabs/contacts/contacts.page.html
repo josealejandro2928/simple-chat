@@ -8,7 +8,7 @@
 
 <ion-content class="bg">
 
-  <ion-list lines="none" class="app-list">
+  <ion-list>
     <ion-item style="position: relative;" *ngFor="let contact of contactsList" (click)="showConversationPage(contact)">
       <ion-avatar slot="start">
         <img *ngIf="contact.avatar" [src]="contact.avatar">

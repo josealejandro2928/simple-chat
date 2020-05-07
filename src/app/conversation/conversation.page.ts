@@ -305,7 +305,7 @@ export class ConversationPage implements OnInit {
       });
       indexNoRead++;
       let tempArray = messagesArray.splice(0, indexNoRead);
-      tempArray.push({ message: `${this.notReadMessages} messages nor read`, action: 'not-read', _id: undefined });
+      tempArray.push({ message: `${this.notReadMessages} messages not read`, action: 'not-read', _id: undefined });
       tempArray = tempArray.concat(messagesArray);
       return tempArray;
     } else {

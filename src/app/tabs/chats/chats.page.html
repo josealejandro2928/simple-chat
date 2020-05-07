@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Conversations
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg">
+
+  <ion-list>
+
+    <ion-item style="position: relative;" *ngFor="let chat of chatList" (click)="showConversationPage()">
+      <ion-avatar slot="start">
+        <img *ngIf="!chat.userTo.avatar" src="../../assets/imgs/profile2.png" />
+        <img *ngIf="chat.userTo.avatar" [src]="chat.userTo.avatar" />
+      </ion-avatar>
+      <ion-label>
+        <h3>{{ chat.userTo.name }}</h3>
+        <p style="margin-top: 4px;">
+          {{ (chat.lastMessage.message.length < 35 )?chat.lastMessage.message:chat.lastMessage.message.substr(0,32) + ' ...' }}
+        </p>
+        <p style=" text-align: right;">{{ chat.lastMessage.date|date:'short' }}</p>
+      </ion-label>
+
+      <ion-badge [ngClass]="{'badgeConnected':chat.userTo.isConnected , 'badgeNotConnected':!chat.userTo.isConnected }">{{
+        chat.notReadMessages}}
+      </ion-badge>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>
