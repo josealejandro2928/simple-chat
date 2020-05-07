@@ -1,3 +1,4 @@
+import { ShowToastService } from 'src/app/core/services/show-toast.service';
 import { LoggedInUserService } from './../core/services/logged-in-user.service';
 import { Socket } from 'ngx-socket-io';
 import { SimpleChatService } from './../core/services/simple-chat/simple-chat.service';
@@ -6,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
+import { ShowAlertService } from '../core/services/show-alert.service';
 
 @Component({
   selector: 'app-conversation',
@@ -41,12 +43,18 @@ export class ConversationPage implements OnInit {
   lastScrollTop = 0;
   scrollignState = 'top';
   loadingMore = false;
+  countForTouch = 0;
+  touchIntervalTime = undefined;
+  selectionState = false;
+  selection = {};
 
   constructor(
     private simpleChatService: SimpleChatService,
     private route: ActivatedRoute,
     private socket: Socket,
     private loggedInUserService: LoggedInUserService,
+    private showAlert: ShowAlertService,
+    private showToast: ShowToastService,
   ) {}
 
   ngOnInit() {
@@ -122,6 +130,9 @@ export class ConversationPage implements OnInit {
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
     }
+    if (this.touchIntervalTime) {
+      clearInterval(this.touchIntervalTime);
+    }
   }
 
   showOptionsToggle(value?: boolean) {
@@ -135,22 +146,23 @@ export class ConversationPage implements OnInit {
   initChat(params) {
     this.simpleChatService.initChat(params).subscribe((data) => {
       console.log('ConversationPage -> initChat -> data', data);
-      this.messages = data.messages;
+
       this.chat = data.simpleChat;
       this.contactInfo = data.simpleChat.userTo;
+      this.notReadMessages = data.notReadMessages || 0;
       if (data.simpleChat.lastMessageSendOrRead) {
         this.lastMessageReadOrSendId = data.simpleChat.lastMessageSendOrRead;
+        this.messages = this.processingForNotReadMessage(data.messages);
+      } else {
+        this.messages = data.messages;
       }
+      console.log('ConversationPage -> initChat -> this.messages', this.messages);
       this.lastMessageId = data.simpleChat.lastMessage;
-      this.notReadMessages = data.notReadMessages || 0;
       if (this.lastMessageReadOrSendId) {
         this.scrollIntoMessage(this.lastMessageReadOrSendId);
       }
       this.backwardFirstMessage = this.messages[0];
       this.forwardLastMessage = this.messages[Math.max(this.messages.length - 1, 0)];
-      // setTimeout(() => {
-      //   this.ionContent.scrollEvents = true;
-      // }, 2000);
     });
   }
 
@@ -206,7 +218,7 @@ export class ConversationPage implements OnInit {
     } else {
       this.scrollignState = 'inside';
     }
-    if (dataScroll.scrollTop <= 20 && this.scrollDirection == 'up') {
+    if (dataScroll.scrollTop <= 100 && this.scrollDirection == 'up') {
       let query = {
         action: 'backward',
         limit: 5,
@@ -221,7 +233,61 @@ export class ConversationPage implements OnInit {
     this.scrollIntoMessage(elementId);
   }
 
+  onTouchStart(id) {
+    if (!this.selectionState) {
+      this.touchIntervalTime = setInterval(() => {
+        this.countForTouch++;
+        if (this.countForTouch > 5) {
+          this.selectionState = true;
+          this.countForTouch = 0;
+          clearInterval(this.touchIntervalTime);
+          this.selection[id] = true;
+        }
+      }, 50);
+    } else {
+      if (this.selection[id]) {
+        delete this.selection[id];
+      } else {
+        this.selection[id] = true;
+      }
+      console.log('pepe selecciono el selection state');
+    }
+  }
 
+  onTouchEnd(id) {
+    if (!this.selectionState) {
+      if (this.touchIntervalTime) {
+        clearInterval(this.touchIntervalTime);
+      }
+      this.countForTouch = 0;
+    } else {
+      if (Object.keys(this.selection).length == 0) {
+        this.selectionState = false;
+      }
+    }
+  }
+
+  onCancellSelection() {
+    this.selectionState = false;
+    this.selection = {};
+  }
+
+  onDeleteMessages() {
+    this.showAlert.showAlert('Delete messages', 'Are you sure to delete these messages').then((alert) => {
+      alert.onDidDismiss().then((data) => {
+        if (data.data) {
+        }
+      });
+    });
+  }
+
+  onSendToContact() {
+    this.showToast.showInfo('We are working in this feature', 3000);
+  }
+
+  getSelectedElements() {
+    return Object.keys(this.selection);
+  }
 
   ///////////////////////////////UTILES////////////////////
   scrollIntoMessage(_id) {
@@ -230,6 +296,21 @@ export class ConversationPage implements OnInit {
       elementDom.scrollIntoView({ behavior: 'smooth' });
       clearTimeout(timeOut);
     }, 50);
+  }
+
+  processingForNotReadMessage(messagesArray) {
+    if (this.notReadMessages) {
+      let indexNoRead = messagesArray.findIndex((item) => {
+        return item._id.toString() == this.lastMessageReadOrSendId.toString();
+      });
+      indexNoRead++;
+      let tempArray = messagesArray.splice(0, indexNoRead);
+      tempArray.push({ message: `${this.notReadMessages} messages nor read`, action: 'not-read', _id: undefined });
+      tempArray = tempArray.concat(messagesArray);
+      return tempArray;
+    } else {
+      return messagesArray;
+    }
   }
 
   markMessageAsRead(message) {
@@ -278,6 +359,10 @@ export class ConversationPage implements OnInit {
     this.lastScrollTop = 0;
     this.scrollignState = 'top';
     this.loadingMore = false;
+    this.countForTouch = 0;
+    this.touchIntervalTime = undefined;
+    this.selectionState = false;
+    this.selection = {};
   }
 
   showIsWriting() {
