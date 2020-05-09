@@ -6,6 +6,7 @@ import { ShowAlertService } from 'src/app/core/services/show-alert.service';
 import { ShowToastService } from 'src/app/core/services/show-toast.service';
 import { Subject } from 'rxjs';
 import { Socket } from 'ngx-socket-io';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-chats',
@@ -18,6 +19,7 @@ export class ChatsPage {
 
   loggedInUser: any;
   _unsubscribeAll: Subject<any> = new Subject();
+  timeInterval;
 
   query = {
     limit: 10,
@@ -37,6 +39,7 @@ export class ChatsPage {
   ionViewWillEnter() {
     this.initState();
     this.getChats();
+    this.eventFromSocket();
   }
 
   getChats() {
@@ -48,7 +51,7 @@ export class ChatsPage {
         this.query.total = data.total;
         setTimeout(() => {
           this.isLoading = false;
-        }, 250);
+        }, 0);
       },
       () => {
         this.isLoading = false;
@@ -56,7 +59,13 @@ export class ChatsPage {
     );
   }
 
-  ionViewWillLeave() {}
+  ionViewWillLeave() {
+    this._unsubscribeAll.next(true);
+    this._unsubscribeAll.complete();
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
+  }
 
   initState() {
     this._unsubscribeAll = new Subject();
@@ -65,9 +74,72 @@ export class ChatsPage {
       offset: 0,
       total: 0,
     };
+    this.timeInterval = undefined;
   }
 
-  showConversationPage() {
-    this.navCtrl.navigateForward('conversation');
+  showConversationPage(id) {
+    let navigationExtrass: any = {
+      chatId: id,
+    };
+    this.navCtrl.navigateForward('conversation', {
+      queryParams: navigationExtrass,
+    });
+  }
+
+  eventFromSocket() {
+    this.socket
+      .fromEvent('chat-update')
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((data: any) => {
+        let chatId = data.chat._id;
+        this.simpleChatService.getChatById(chatId).subscribe((result) => {
+          let index = this.chatList.findIndex((item) => item._id == chatId);
+          if (index >= 0) {
+            let data = { ...result.simpleChat, notReadMessages: result.notReadMessages };
+            this.chatList[index] = data;
+          }
+        });
+      });
+
+    this.socket
+      .fromEvent('chats-update')
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((data: any) => {
+        this.query = {
+          limit: 10,
+          offset: 0,
+          total: 0,
+        };
+        this.getChats();
+      });
+
+    this.socket
+      .fromEvent('user-typing')
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe((data: any) => {
+        console.log('ChatsPage -> eventFromSocket -> data', data);
+        let index = this.chatList.findIndex((item) => item._id == data.chat._id);
+        if (index >= 0) {
+          this.chatList[index].textAction = data.msg;
+        }
+        this.showIsWriting(this.chatList[index]);
+      });
+  }
+
+  ///////////////////////////////////////////////////////////
+  showIsWriting(chat) {
+    if (chat.isWriting) {
+      return;
+    }
+
+    chat.isWriting = true;
+    let times = 5;
+    let timeInterval = setInterval(() => {
+      times--;
+      if (!times) {
+        clearInterval(timeInterval);
+        chat.isWriting = false;
+      }
+    }, 550);
   }
 }

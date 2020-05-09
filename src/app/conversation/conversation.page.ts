@@ -1,3 +1,4 @@
+import { LoaderService } from './../core/services/loader.service';
 import { ShowToastService } from 'src/app/core/services/show-toast.service';
 import { LoggedInUserService } from './../core/services/logged-in-user.service';
 import { Socket } from 'ngx-socket-io';
@@ -18,7 +19,7 @@ export class ConversationPage implements OnInit {
   private showOptions: boolean = false;
   queryParams = null;
   chat = null;
-  contactInfo = {
+  contactInfo: any = {
     name: 'Contact',
     isConnected: false,
     avatar: '../../assets/imgs/profile2.png',
@@ -53,6 +54,7 @@ export class ConversationPage implements OnInit {
     private route: ActivatedRoute,
     private socket: Socket,
     private loggedInUserService: LoggedInUserService,
+    private loader: LoaderService,
     private showAlert: ShowAlertService,
     private showToast: ShowToastService,
   ) {}
@@ -82,6 +84,10 @@ export class ConversationPage implements OnInit {
       .fromEvent('send-message')
       .pipe(takeUntil(this._unsubscribeAll))
       .subscribe((data: any) => {
+        if (this.chat._id != data.chatId) {
+          return;
+        }
+
         let message = data.data;
         this.messages.push(message);
         this.scrollIntoMessage(message._id);
@@ -110,6 +116,9 @@ export class ConversationPage implements OnInit {
       .fromEvent('message-read')
       .pipe(takeUntil(this._unsubscribeAll))
       .subscribe((data: any) => {
+        if (this.chat._id != data.chatId) {
+          return;
+        }
         let index = this.messages.findIndex((item) => item._id.toString() == data.message._id.toString());
         if (index > -1) {
           this.messages[index] = data.message;
@@ -120,6 +129,9 @@ export class ConversationPage implements OnInit {
       .fromEvent('user-typing')
       .pipe(takeUntil(this._unsubscribeAll))
       .subscribe((data: any) => {
+        if (this.chat._id != data.chatId) {
+          return;
+        }
         this.showIsWriting();
       });
   }
@@ -156,7 +168,6 @@ export class ConversationPage implements OnInit {
       } else {
         this.messages = data.messages;
       }
-      console.log('ConversationPage -> initChat -> this.messages', this.messages);
       this.lastMessageId = data.simpleChat.lastMessage;
       if (this.lastMessageReadOrSendId) {
         this.scrollIntoMessage(this.lastMessageReadOrSendId);
@@ -276,6 +287,24 @@ export class ConversationPage implements OnInit {
     this.showAlert.showAlert('Delete messages', 'Are you sure to delete these messages').then((alert) => {
       alert.onDidDismiss().then((data) => {
         if (data.data) {
+          this.loader.show();
+          this.simpleChatService
+            .removeMessages({ chatId: this.chat._id, messageIds: this.getSelectedElements() })
+            .subscribe(
+              () => {
+                this.getSelectedElements().forEach((id) => {
+                  let index = this.messages.findIndex((element) => element._id == id);
+                  if (index >= 0) {
+                    this.messages.splice(index, 1);
+                  }
+                });
+
+                this.loader.hide();
+              },
+              () => {
+                this.loader.hide();
+              },
+            );
         }
       });
     });
@@ -305,7 +334,7 @@ export class ConversationPage implements OnInit {
       });
       indexNoRead++;
       let tempArray = messagesArray.splice(0, indexNoRead);
-      tempArray.push({ message: `${this.notReadMessages} messages not read`, action: 'not-read', _id: undefined });
+      tempArray.push({ message: `${this.notReadMessages} messages not read`, action: 'not-read', _id: '456Pepe' });
       tempArray = tempArray.concat(messagesArray);
       return tempArray;
     } else {

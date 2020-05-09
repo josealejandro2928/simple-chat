@@ -9,20 +9,23 @@
 <ion-content class="bg">
 
   <ion-list *ngIf="!this.isLoading">
-    <ion-item style="position: relative;" *ngFor="let chat of chatList" (click)="showConversationPage()">
+    <ion-item style="position: relative;" *ngFor="let chat of chatList" (click)="showConversationPage(chat._id)">
       <ion-avatar slot="start">
         <img *ngIf="!chat.userTo.avatar" src="../../assets/imgs/profile2.png" />
         <img *ngIf="chat.userTo.avatar" [src]="chat.userTo.avatar" />
       </ion-avatar>
       <ion-label>
         <h3>{{ chat.userTo.name }}</h3>
-        <p style="margin-top: 4px;">
+        <p style="margin-top: 4px;" *ngIf="!chat.isWriting">
           <ng-container *ngIf="chat.lastMessage">
             {{ (chat.lastMessage.message.length < 35 )?chat.lastMessage.message:chat.lastMessage.message.substr(0,32) + ' ...' }}
           </ng-container>
           <ng-container *ngIf="!chat.lastMessage">
             {{ chat.userTo.msg }}
           </ng-container>
+        </p>
+        <p style="margin-top: 4px;" *ngIf="chat.isWriting" style="color:#4caf50 ;">
+          {{ chat.textAction }}
         </p>
         <p style=" text-align: right;">
           <ng-container *ngIf="chat.lastMessage">

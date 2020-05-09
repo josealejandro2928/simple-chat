@@ -47,4 +47,9 @@ export class SimpleChatService {
     }
     return this.httpClient.get<any>(this.chatUrl, { params: httpParams });
   }
+
+  public removeMessages(data): Observable<any> {
+    return this.httpClient.post<any>(this.chatUrlId.replace(':id', data.chatId) + '/remove-messages', data);
+  }
+  
 }
