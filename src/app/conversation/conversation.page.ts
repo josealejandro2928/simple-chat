@@ -210,6 +210,8 @@ export class ConversationPage implements OnInit {
     );
   }
 
+  showContactProfile() {}
+
   onScroll(event) {
     let dataScroll = {
       scrollTop: event.srcElement.scrollTop,
