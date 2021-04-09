@@ -1,4 +1,4 @@
-### Simple Chat
+### Simple Chat Ionic App
 ```Instant messaging application developed in Ionic. It uses socket io for communication in real time.
 ```
 1-For your use, clone the project.
