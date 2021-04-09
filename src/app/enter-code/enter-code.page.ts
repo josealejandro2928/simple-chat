@@ -16,7 +16,6 @@ export class EnterCodePage implements OnInit {
   confirmationCode: string = '';
   codeForm = new FormControl(null, [
     Validators.required,
-    Validators.minLength(5),
   ]);
   email: string = '';
   loggedUser: any;
