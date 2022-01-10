@@ -16,7 +16,7 @@ import { ShowAlertService } from '../core/services/show-alert.service';
   styleUrls: ['./conversation.page.scss'],
 })
 export class ConversationPage implements OnInit {
-  private showOptions: boolean = false;
+  showOptions: boolean = false;
   queryParams = null;
   chat = null;
   contactInfo: any = {
@@ -29,7 +29,7 @@ export class ConversationPage implements OnInit {
   lastMessageReadOrSendId = null;
   scrollState = 'top'; // top|inside|bottom;
 
-  private messages: Array<any> = [];
+  messages: Array<any> = [];
 
   loggedInUser: any;
   _unsubscribeAll: Subject<any> = new Subject();

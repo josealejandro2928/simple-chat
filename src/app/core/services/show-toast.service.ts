@@ -14,7 +14,6 @@ export class ShowToastService {
       position: 'bottom',
       duration: time,
       color: 'danger',
-      showCloseButton: true,
     });
     toast.present();
   }
@@ -26,7 +25,6 @@ export class ShowToastService {
       position: 'bottom',
       duration: time,
       color: 'success',
-      showCloseButton: true,
     });
     toast.present();
   }
@@ -39,7 +37,6 @@ export class ShowToastService {
       position: 'bottom',
       duration: time,
       color: 'dark',
-      showCloseButton: true,
     });
     toast.present();
   }

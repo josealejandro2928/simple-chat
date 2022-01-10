@@ -24,12 +24,16 @@ const config: SocketIoConfig = { url: environment.apiUrl, options: {} };
   imports: [
     BrowserModule,
     HttpClientModule,
-    IonicModule.forRoot(),
+    IonicModule.forRoot({
+      animated: true,
+      infiniteLoadingSpinner: 'circles',
+      mode: 'md',
+    }),
     AppRoutingModule,
     IonicStorageModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
-    SocketIoModule.forRoot(config)
+    SocketIoModule.forRoot(config),
   ],
 
   providers: [

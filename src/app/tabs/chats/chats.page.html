@@ -1,51 +1,39 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>
-      Conversations
-    </ion-title>
+    <ion-title> Conversations </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="bg">
-
-  <ion-list *ngIf="!this.isLoading">
-    <ion-item style="position: relative;" *ngFor="let chat of chatList" (click)="showConversationPage(chat._id)">
+  <ion-list>
+    <ion-item style="position: relative" *ngFor="let chat of chatList" (click)="showConversationPage(chat._id)">
       <ion-avatar slot="start">
         <img *ngIf="!chat.userTo.avatar" src="../../assets/imgs/profile2.png" />
         <img *ngIf="chat.userTo.avatar" [src]="chat.userTo.avatar" />
       </ion-avatar>
       <ion-label>
         <h3>{{ chat.userTo.name }}</h3>
-        <p style="margin-top: 4px;" *ngIf="!chat.isWriting">
+        <p style="margin-top: 4px" *ngIf="!chat.isWriting">
           <ng-container *ngIf="chat.lastMessage">
-            {{ (chat.lastMessage.message.length < 35 )?chat.lastMessage.message:chat.lastMessage.message.substr(0,32) + ' ...' }}
+            {{ (chat.lastMessage.message.length < 35 )?chat.lastMessage.message:chat.lastMessage.message.substr(0,32) +
+            ' ...' }}
           </ng-container>
-          <ng-container *ngIf="!chat.lastMessage">
-            {{ chat.userTo.msg }}
-          </ng-container>
+          <ng-container *ngIf="!chat.lastMessage"> {{ chat.userTo.msg }} </ng-container>
         </p>
-        <p style="margin-top: 4px;" *ngIf="chat.isWriting" style="color:#4caf50 ;">
-          {{ chat.textAction }}
-        </p>
-        <p style=" text-align: right;">
-          <ng-container *ngIf="chat.lastMessage">
-            {{ chat.lastMessage.date|date:'short' }}
-          </ng-container>
-          <ng-container *ngIf="!chat.lastMessage">
-            {{ chat.createdAt|date:'short' }}
-          </ng-container>
-
+        <p style="margin-top: 4px" *ngIf="chat.isWriting" style="color: #4caf50">{{ chat.textAction }}</p>
+        <p style="text-align: right">
+          <ng-container *ngIf="chat.lastMessage"> {{ chat.lastMessage.date|date:'short' }} </ng-container>
+          <ng-container *ngIf="!chat.lastMessage"> {{ chat.createdAt|date:'short' }} </ng-container>
         </p>
       </ion-label>
 
-      <ion-badge [ngClass]="{'badgeConnected':chat.userTo.isConnected , 'badgeNotConnected':!chat.userTo.isConnected }">{{
-        chat.notReadMessages}}
+      <ion-badge [ngClass]="{'badgeConnected':chat.userTo.isConnected , 'badgeNotConnected':!chat.userTo.isConnected }"
+        >{{ chat.notReadMessages}}
       </ion-badge>
     </ion-item>
-
   </ion-list>
 
-  <ion-list *ngIf="this.isLoading">
+  <!-- <ion-list *ngIf="this.isLoading">
     <ion-item *ngFor="let item of [1,2,3,4,5,6]">
       <ion-thumbnail slot="start">
         <ion-skeleton-text></ion-skeleton-text>
@@ -62,6 +50,5 @@
         </p>
       </ion-label>
     </ion-item>
-  </ion-list>
-
+  </ion-list> -->
 </ion-content>
