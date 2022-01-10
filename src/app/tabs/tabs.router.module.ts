@@ -12,7 +12,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: './chats/chats.module#ChatsPageModule',
+            loadChildren: () => import('./chats/chats.module').then(m => m.ChatsPageModule),
           },
         ],
       },
@@ -21,7 +21,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: './contacts/contacts.module#ContactsPageModule',
+            loadChildren: () => import('./contacts/contacts.module').then(m => m.ContactsPageModule),
           },
         ],
       },
@@ -30,7 +30,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: './tab3/tab3.module#Tab3PageModule',
+            loadChildren: () => import('./tab3/tab3.module').then(m => m.Tab3PageModule),
           },
         ],
       },
